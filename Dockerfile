@@ -35,14 +35,13 @@ ENV GOPATH=/go PATH=$PATH:/go/bin TZ=Asia/Shanghai GEM_PATH=/home/repo/.gem/ruby
 WORKDIR /go/src/yum-mirror
 COPY . ./
 
+RUN go get && go build
+
 RUN cp -f nginx.conf /etc/nginx/nginx.conf && \
     cp nginx-site.conf /etc/nginx/conf.d/ && \
     chown repo:root -R . /data /etc/nginx/conf.d/ && \
     chmod -R 775  /etc/nginx/conf.d/ *.sh && \
-	chmod 777 /data
-
-RUN go get && go build
-
+	chmod 2777 -R /data && chmod -R 2775 .
 
 STOPSIGNAL SIGTERM
 USER repo
