@@ -10,6 +10,8 @@ RUN yum install -y epel-release && \
 	make \
 	mercurial \
 	nginx \
+	which \
+	net-tools \
 	yum-utils
 
 

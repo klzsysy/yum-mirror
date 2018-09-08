@@ -254,6 +254,7 @@ func (c *Yumfile) reposync(repo *Repo) error {
 		"--norepopath",
 		"--downloadcomps",
 		"--download-metadata",
+		fmt.Sprintf("-e %s", TmpYumCachePath),
 	}
 
 	if QuietMode {

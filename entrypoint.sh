@@ -3,7 +3,7 @@
 
 set -xe
 
-if [  "$#" -ne 0 ];then
+if which $1 > /dev/null ;then
     exec "$@"
     exit $?
 fi 
@@ -33,18 +33,19 @@ trap 'handle_TERM' SIGTERM
 nginx -t && nginx
 
 yumsync(){
-    exec ./yum-mirror --tmppath=/data/cache yumfile --file config/yumfile.conf sync &
+    exec ./yum-mirror --tmppath=/data/cache yumfile --file config/yumfile.conf sync $@ &
     syncpid=$!
 }
 
-yumsync
+yumsync $@
 
 while true;
 do
     wait ${syncpid}
     if date '+%H-%M' | grep -Eq "${DAYS_SYNC_TIME}" && echo "${WEEK_SYNC_TIME}" | grep -q "$(date '+%u')" ;then
-        yumsync
+        yumsync $@
     else
-        sleep 50
+        sleep 50 &
+        wait $!
     fi
 done
