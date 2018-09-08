@@ -1,93 +1,35 @@
-# y10k [![Build Status](https://travis-ci.org/cavaliercoder/y10k.svg?branch=master)](https://travis-ci.org/cavaliercoder/y10k)
+# yum repo local mirror
 
-*Simplified Yum repository management from the year 10,000 AD*
+## 快速开始
 
-y10k is a tool to deploy Yum/RPM repositories and mirrors in your local
-environment using settings described in a INI formatted `Yumfile`.
+```sh
+# rpm data folder
+data_path="${HOME}/data/yum-mirror"
 
-It is a wrapper for `reposync` and `createrepo` but takes the hard work out of
-writing shell scripts for each of your mirrors. It also provides an abstraction
-to ease management with configuration management tools like Puppet and Chef.
+docker run -v ${data_path}:/mirror --name yum-mirror -p 8080:8080 -d klzsysy/yum-mirror
 
-What about Pulp/Satellite/Other? I wanted a cron job that syncronizes my repos
-with the upstreams into a folder shared in Apache/nginx. I don't want to deploy
-a database, server, agents, configure channel registrations, etc. etc.
-
-y10k is inspired by tools such as Puppet's [R10K](https://github.com/puppetlabs/r10k)
-and Ruby's [Bundler](http://bundler.io/gemfile.html).
-
-Hey cool there's [documentation](http://cavaliercoder.github.io/y10k).
-
-Oh, and you can [download y10k](https://sourceforge.net/projects/y10k/files/latest/download)
-precompiled binaries.
-
-## Usage
-
-```
-NAME:
-   y10k - simplified yum mirror management
-
-USAGE:
-   y10k [global options] command [command options] [arguments...]
-
-VERSION:
-   0.3.0
-
-AUTHOR(S):
-   Ryan Armstrong <ryan@cavaliercoder.com>
-
-COMMANDS:
-   yumfile	work with a Yumfile
-   version	print the version of y10k
-   help, h	Shows a list of commands or help for one command
-
-GLOBAL OPTIONS:
-   --logfile, -l 		redirect output to a log file [$Y10K_LOGFILE]
-   --quiet, -q			less verbose
-   --debug, -d			print debug output [$Y10K_DEBUG]
-   --tmppath, -t "/tmp/y10k"	path to y10k temporary objects [$Y10K_TMPPATH]
-   --help, -h			show help
-   --version, -v		print the version
-
+open http://127.0.0.1:8080
 ```
 
-## Yumfile format
+## 变更
 
-```ini
-#
-# Global settings
-#
-pathprefix=/var/www/html/pub
+在原基础上:
+- 封装nginx作http服务，默认端口8080
+- 更换国内源
+- 添加定时运行
+- 修改挂载路径
+- 修改权限，以便在无root环境运行
+- 兼容openshift无特权运行
 
-#
-# CentOS 7 x86_64 mirror
-#
-[centos-7-x86_64-base]
-name=CentOS 7 x86_64 Base
-mirrorlist=http://mirrorlist.centos.orgbroken/?release=7&arch=x86_64&repo=os
-localpath=centos/7/os/x86_64
-arch=x86_64
+快速一键部署本地yum mirror (*^▽^*)
 
-[centos-7-x86_64-updates]
-name=CentOS 7 x86_64 Updates
-mirrorlist=http://mirrorlist.centos.org/?release=7&arch=x86_64&repo=updates
-localpath=centos/7/updates/x86_64
-arch=x86_64
+## 新增变量
 
-```  
+- `DAYS_SYNC_TIME` 每天同步的时间 `小时-分钟`， 默认  `01-10`
+- `WEEK_SYNC_TIME` 每周同步的时间 1-7 1是周一， 例如 `1 2 3` 为周一到周三，默认每天`all`
+- `HTTP_PORT` 默认8080
 
-## License
+## 配置
 
-Y10K Copyright (C) 2014 Ryan Armstrong (ryan@cavaliercoder.com)
-
-This program is free software: you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free Software
-Foundation, either version 3 of the License, or (at your option) any later
-version.
-
-This program is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-PARTICULAR PURPOSE. See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along with
-this program. If not, see http://www.gnu.org/licenses/.
+- [config.yaml](config/yumfile.conf) ， 挂载路径 `/go/src/yum-mirror/config.yaml`
+- data挂载点 `/data`

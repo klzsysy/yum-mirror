@@ -9,15 +9,42 @@ RUN yum install -y epel-release && \
 	golang \
 	make \
 	mercurial \
+	nginx \
 	yum-utils
 
+
+RUN useradd -u 10000 -G nginx repo && \
+    mkdir -p /data && \
+    chmod g+s /data && \
+    chmod 755 -R /home/repo && \
+    mkdir -p /var/nginx && \
+	chmod -R 777 /var/run && \
+    chown repo:root -R /var/lib/nginx/  /var/nginx && \
+    chmod 775 -R /var/lib/nginx/ /var/nginx && \
+    chmod 775 /var/log/nginx && \
+	ln -sf /dev/stdout /var/log/nginx/access.log && \
+	ln -sf /dev/stderr /var/log/nginx/error.log
+
+
 # setup GOPATH and source directory
-RUN mkdir -p /go/{bin,pkg,src} /usr/src/y10k
-ENV GOPATH=/go PATH=$PATH:/go/bin
+RUN mkdir -p /go/{bin,pkg,src} /go/src/yum-mirror && go get -u github.com/codegangsta/cli
+ENV GOPATH=/go PATH=$PATH:/go/bin TZ=Asia/Shanghai GEM_PATH=/home/repo/.gem/ruby:/usr/share/gems:/usr/local/share/gems
 
-# install package deps
-ADD Makefile /tmp/Makefile
-RUN cd /tmp && make get-deps
+WORKDIR /go/src/yum-mirror
+COPY . ./
 
-# open shell in source dir
-CMD cd /usr/src/y10k; /bin/bash
+RUN cp -f nginx.conf /etc/nginx/nginx.conf && \
+    cp nginx-site.conf /etc/nginx/conf.d/ && \
+    chown repo:root -R . /data /etc/nginx/conf.d/ && \
+    chmod -R 775  /data  /etc/nginx/conf.d/ *.sh
+
+RUN go get && go build
+
+
+STOPSIGNAL SIGTERM
+USER repo
+VOLUME [ "/data" ]
+
+EXPOSE 8080
+
+ENTRYPOINT [ "./entrypoint.sh" ]
