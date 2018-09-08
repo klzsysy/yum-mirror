@@ -220,6 +220,14 @@ func (c *Yumfile) installYumConf(repo *Repo) error {
 	}
 	defer f.Close()
 
+	// _, err = os.Stat(TmpYumCachePath)
+	// if err != nil {
+	// 	_, err := os.Create(TmpYumCachePath)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// }
+
 	// global yum conf
 	fmt.Fprintf(f, "[main]\n")
 	fmt.Fprintf(f, "cachedir=%s\n", TmpYumCachePath)

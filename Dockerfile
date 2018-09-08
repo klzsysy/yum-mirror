@@ -38,7 +38,8 @@ COPY . ./
 RUN cp -f nginx.conf /etc/nginx/nginx.conf && \
     cp nginx-site.conf /etc/nginx/conf.d/ && \
     chown repo:root -R . /data /etc/nginx/conf.d/ && \
-    chmod -R 775  /data  /etc/nginx/conf.d/ *.sh
+    chmod -R 775  /etc/nginx/conf.d/ *.sh && \
+	chmod 777 /data
 
 RUN go get && go build
 
