@@ -14,7 +14,6 @@ DAYS_SYNC_TIME=${DAYS_SYNC_TIME:='01-10'}
 
 WEEK_SYNC_TIME=${WEEK_SYNC_TIME:='all'}
 
-OPTION=${OPTION:='--debug'}
 
 if [ "${WEEK_SYNC_TIME}" == 'all' ];then
     WEEK_SYNC_TIME=$(seq 1 7)
