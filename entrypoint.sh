@@ -1,16 +1,20 @@
 #!/usr/bin/env bash
 # by klzsysy
 
-set -xe
+set -e
 
-if which $1 > /dev/null ;then
-    exec "$@"
-    exit $?
-fi 
+if [ "$#" -ne 0 ];then
+    if which $1 > /dev/null ;then
+        exec "$@"
+        exit $?
+    fi
+fi
 
 DAYS_SYNC_TIME=${DAYS_SYNC_TIME:='01-10'}
 
 WEEK_SYNC_TIME=${WEEK_SYNC_TIME:='all'}
+
+OPTION=${OPTION:='--debug'}
 
 if [ "${WEEK_SYNC_TIME}" == 'all' ];then
     WEEK_SYNC_TIME=$(seq 1 7)
@@ -33,7 +37,7 @@ trap 'handle_TERM' SIGTERM
 nginx -t && nginx
 
 yumsync(){
-    exec ./yum-mirror --tmppath=/data/cache yumfile --file config/yumfile.conf sync $@ &
+    exec ./yum-mirror ${OPTION} --tmppath=/data/cache yumfile --file config/yumfile.conf sync $@ &
     syncpid=$!
 }
 
