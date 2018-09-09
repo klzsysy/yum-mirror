@@ -263,7 +263,6 @@ func (c *Yumfile) reposync(repo *Repo) error {
 		"--downloadcomps",
 		"--download-metadata",
 		fmt.Sprintf("--cachedir=%s", TmpYumCachePath),
-		"--tempcache",
 	}
 
 	if QuietMode {
