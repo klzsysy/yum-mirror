@@ -26,9 +26,10 @@ fi
 function handle_TERM()
 {
         kill -s SIGTERM $(ps aux | grep -v grep| grep  'nginx: master' | awk '{print $2}')
+        kill -s SIGTERM "${sleep_pid}"
         kill -s SIGTERM "$syncpid"
         wait "$syncpid"
-        exit
+        exit $?
 }
 
 trap 'handle_TERM' SIGTERM
@@ -49,6 +50,7 @@ do
         yumsync $@
     else
         sleep 50 &
-        wait $!
+        sleep_pid=$!
+        wait ${sleep_pid}
     fi
 done
