@@ -28,6 +28,7 @@ open http://127.0.0.1:8080
 - `DAYS_SYNC_TIME` 每天同步的时间 `小时-分钟`， 默认  `01-10`
 - `WEEK_SYNC_TIME` 每周同步的时间 1-7 1是周一， 例如 `1 2 3` 为周一到周三，默认每天`all`
 - `HTTP_PORT` 默认8080
+- `SERVER_NAME` 用于生成客户端repo文件的baseurl地址，是部署服务器IP或指向该服务器的域名
 
 ## 配置
 

@@ -13,6 +13,7 @@ fi
 DAYS_SYNC_TIME=${DAYS_SYNC_TIME:='01-10'}
 
 WEEK_SYNC_TIME=${WEEK_SYNC_TIME:='all'}
+SERVER_NAME=${SERVER_NAME:-'localhost'}
 
 
 if [ "${WEEK_SYNC_TIME}" == 'all' ];then
@@ -22,6 +23,10 @@ fi
 if [ -n "${HTTP_PORT}" ];then
     sed -i "s/8080/${HTTP_PORT}/" /etc/nginx/conf.d/nginx-site.conf
 fi
+
+function info(){
+    echo "$(date '+%F %T') - info: $@"
+}
 
 function handle_TERM()
 {
@@ -34,19 +39,26 @@ function handle_TERM()
 
 trap 'handle_TERM' SIGTERM
 
+
 nginx -t && nginx
 
+
+info "build client repo"
+awk -f build_client_repo.awk config/yumfile.conf > /data/client.repo
+info "you repo url: $(echo "${SERVER_NAME}" | sed 's/\$//')/client.repo"
+
 yumsync(){
-    echo "$(date '+%F %T') start sync ....."
+    info "start sync ....."
     exec ./yum-mirror ${OPTION} --tmppath=/data/cache yumfile --file config/yumfile.conf sync $@ &
     syncpid=$!
+    wait $syncpid
+    info "sync end"
 }
 
 yumsync $@
 
 while true;
 do
-    wait ${syncpid}
     if date '+%H-%M' | grep -Eq "${DAYS_SYNC_TIME}" && echo "${WEEK_SYNC_TIME}" | grep -q "$(date '+%u')" ;then
         yumsync $@
     else
