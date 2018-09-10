@@ -37,6 +37,7 @@ trap 'handle_TERM' SIGTERM
 nginx -t && nginx
 
 yumsync(){
+    echo "$(date '+%F %T') start sync ....."
     exec ./yum-mirror ${OPTION} --tmppath=/data/cache yumfile --file config/yumfile.conf sync $@ &
     syncpid=$!
 }
