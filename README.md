@@ -6,9 +6,12 @@
 # rpm data folder
 data_path="${HOME}/data/yum-mirror"
 
-docker run -v ${data_path}:/mirror --name yum-mirror -p 8080:8080 -d klzsysy/yum-mirror
+# you server ip or domain
+SERVER_NAME=http://yum-repo.example.com
 
-open http://127.0.0.1:8080
+docker run -v ${data_path}:/mirror --name yum-mirror -p 8080:8080 -d klzsysy/yum-mirror
+# view repo index and client repo file
+open ${SERVER_NAME}:8080
 ```
 
 ## 变更
