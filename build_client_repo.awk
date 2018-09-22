@@ -43,6 +43,7 @@ BEGIN {
         repo = repo "baseurl="
         repo = repo servername $0 "\n"
         repo = repo "enabled=1\n"
+        repo = repo "gpgcheck=0\n"
 
     }
 
